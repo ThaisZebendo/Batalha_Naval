@@ -1,5 +1,35 @@
 #include <stdio.h>
 
+// ===== NOVAS FUNÇÕES =====
+
+// Função auxiliar para verificar se é possível posicionar um navio
+int podePosicionar(int tabuleiro[10][10], int linha, int coluna, int tamanho, int direcao) {
+    // direcao: 0 = horizontal, 1 = vertical, 2 = diagonal principal, 3 = diagonal secundária
+    for (int k = 0; k < tamanho; k++) {
+        int i = linha, j = coluna;
+        if (direcao == 0) j += k;           // horizontal
+        else if (direcao == 1) i += k;      // vertical
+        else if (direcao == 2) { i += k; j += k; }   // diagonal principal
+        else if (direcao == 3) { i += k; j -= k; }   // diagonal secundária
+
+        // Verifica limites
+        if (i < 0 || i >= 10 || j < 0 || j >= 10) return 0;
+        // Verifica sobreposição
+        if (tabuleiro[i][j] != 0) return 0;
+    }
+    return 1;
+}
+
+// Função para posicionar o navio no tabuleiro
+void posicionarNavio(int tabuleiro[10][10], int linha, int coluna, int tamanho, int direcao) {
+    for (int k = 0; k < tamanho; k++) {
+        if (direcao == 0) tabuleiro[linha][coluna + k] = 3;          // horizontal
+        else if (direcao == 1) tabuleiro[linha + k][coluna] = 3;     // vertical
+        else if (direcao == 2) tabuleiro[linha + k][coluna + k] = 3; // diagonal principal
+        else if (direcao == 3) tabuleiro[linha + k][coluna - k] = 3; // diagonal secundária
+    }
+}
+
 int main() {
     // Letras para referência das colunas
     char colunas[10] = {'A','B','C','D','E','F','G','H','I','J'};
@@ -12,28 +42,38 @@ int main() {
         }
     }
 
-    // 2. Criar os navios (vetores unidimensionais com tamanho fixo = 3)
-    int navioHorizontal[3] = {3, 3, 3};
-    int navioVertical[3]   = {3, 3, 3};
+    // ===== CÓDIGO ANTIGO (comentado) =====
+    // int navioHorizontal[3] = {3, 3, 3};
+    // int navioVertical[3]   = {3, 3, 3};
+    // int linhaHorizontal = 2;
+    // int colunaHorizontal = 4;
+    // int linhaVertical = 5;
+    // int colunaVertical = 7;
+    // for (int k = 0; k < 3; k++) {
+    //     tabuleiro[linhaHorizontal][colunaHorizontal + k] = navioHorizontal[k];
+    // }
+    // for (int k = 0; k < 3; k++) {
+    //     tabuleiro[linhaVertical + k][colunaVertical] = navioVertical[k];
+    // }
 
-    // 3. Definir coordenadas iniciais dos navios
-    // Navio horizontal em linha 2, coluna 4
-    int linhaHorizontal = 2;
-    int colunaHorizontal = 4;
+    // ===== NOVO POSICIONAMENTO =====
+    int tamanho = 3;
 
-    // Navio vertical em linha 5, coluna 7
-    int linhaVertical = 5;
-    int colunaVertical = 7;
+    // Navio horizontal
+    if (podePosicionar(tabuleiro, 2, 4, tamanho, 0))
+        posicionarNavio(tabuleiro, 2, 4, tamanho, 0);
 
-    // 4. Posicionar navio horizontal no tabuleiro
-    for (int k = 0; k < 3; k++) {
-        tabuleiro[linhaHorizontal][colunaHorizontal + k] = navioHorizontal[k];
-    }
+    // Navio vertical
+    if (podePosicionar(tabuleiro, 5, 7, tamanho, 1))
+        posicionarNavio(tabuleiro, 5, 7, tamanho, 1);
 
-    // 5. Posicionar navio vertical no tabuleiro
-    for (int k = 0; k < 3; k++) {
-        tabuleiro[linhaVertical + k][colunaVertical] = navioVertical[k];
-    }
+    // Navio diagonal principal (↘)
+    if (podePosicionar(tabuleiro, 0, 0, tamanho, 2))
+        posicionarNavio(tabuleiro, 0, 0, tamanho, 2);
+
+    // Navio diagonal secundária (↙)
+    if (podePosicionar(tabuleiro, 0, 9, tamanho, 3))
+        posicionarNavio(tabuleiro, 0, 9, tamanho, 3);
 
     // 6. Imprimir o tabuleiro
     printf("\n=== Tabuleiro Batalha Naval ===\n\n");
